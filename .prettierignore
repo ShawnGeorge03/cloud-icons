@@ -1,0 +1,10 @@
+# See https://prettier.io/docs/en/ignore.html for more about ignoring files.
+
+# dependencies
+node_modules
+pnpm-lock.yaml
+
+# logs
+logs
+*.log
+pnpm-debug.log*

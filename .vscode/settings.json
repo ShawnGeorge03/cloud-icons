@@ -1,0 +1,18 @@
+{
+  "[svg]": {
+    "editor.defaultFormatter": "jock.svg"
+  },
+  "conventionalCommits.emojiFormat": "emoji",
+  "conventionalCommits.autoCommit": false,
+  "conventionalCommits.promptCI": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.validate": ["javascript"],
+  "prettier.configPath": ".prettierrc",
+  "prettier.ignorePath": ".prettierignore",
+  "svg.preview.background": "transparent",
+  "cSpell.words": ["Sourcer"]
+}

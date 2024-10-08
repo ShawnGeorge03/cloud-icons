@@ -1,0 +1,7 @@
+{
+  "name": "builder",
+  "version": "0.0.1",
+  "description": "Builds the Cloud Icons",
+  "private": true,
+  "type": "module"
+}
