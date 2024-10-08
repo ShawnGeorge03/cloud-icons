@@ -3,5 +3,12 @@
   "version": "0.0.1",
   "description": "Builds the Cloud Icons",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "source": "node src/sourcer/main.js"
+  },
+  "dependencies": {
+    "jsonschema": "^1.4.1",
+    "selenium-webdriver": "^4.25.0"
+  }
 }

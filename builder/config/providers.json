@@ -1,0 +1,40 @@
+[
+  {
+    "site": "AWS",
+    "url": "https://aws.amazon.com/architecture/icons/",
+    "actions": [
+      {
+        "type": "click",
+        "locator": "button[aria-haspopup=dialog]"
+      },
+      {
+        "type": "attribute",
+        "locator": "Icon package"
+      }
+    ]
+  },
+  {
+    "site": "Azure",
+    "url": "https://learn.microsoft.com/en-us/azure/architecture/icons/#icon-terms",
+    "actions": [
+      {
+        "type": "click",
+        "locator": "label.checkbox.azure-icons-consent"
+      },
+      {
+        "type": "attribute",
+        "locator": "Download SVG icons"
+      }
+    ]
+  },
+  {
+    "site": "GCP",
+    "url": "https://cloud.google.com/icons?hl=en",
+    "actions": [
+      {
+        "type": "attribute",
+        "locator": "SVG and PNG icons\nDownload the icons (ZIP)."
+      }
+    ]
+  }
+]
