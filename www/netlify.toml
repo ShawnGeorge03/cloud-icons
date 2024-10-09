@@ -1,0 +1,9 @@
+[build]
+  publish = "www/dist"
+  command = "pnpm --filter www build"
+[build.processing.html]
+  pretty_urls = false
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

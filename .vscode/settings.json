@@ -1,4 +1,7 @@
 {
+  "[astro]": {
+    "editor.defaultFormatter": "astro-build.astro-vscode"
+  },
   "[svg]": {
     "editor.defaultFormatter": "jock.svg"
   },
@@ -10,9 +13,10 @@
     "source.organizeImports": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "eslint.validate": ["javascript"],
+  "eslint.validate": ["javascript", "astro"],
   "prettier.configPath": ".prettierrc",
   "prettier.ignorePath": ".prettierignore",
+  "prettier.documentSelectors": ["**/*.astro"],
   "svg.preview.background": "transparent",
   "cSpell.words": ["Sourcer"]
 }

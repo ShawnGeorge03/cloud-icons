@@ -10,7 +10,8 @@
     "streetsidesoftware.code-spell-checker",
     "visualstudioexptteam.vscodeintellicode",
     "vivaxy.vscode-conventional-commits",
-    "yoavbls.pretty-ts-errors"
+    "yoavbls.pretty-ts-errors",
+    "astro-build.astro-vscode"
   ],
   "unwantedRecommendations": []
 }
