@@ -1,11 +1,15 @@
 {
   "name": "cloud-icons",
-  "version": "0.0.1",
-  "description": "Cloud Providers Icons",
+  "version": "0.1.0",
+  "description": "Cloud Service Providers Icons",
   "author": "Shawn Santhoshgeorge <32755895+ShawnGeorge03@users.noreply.github.com>",
   "homepage": "https://github.com/ShawnGeorge03/cloud-icons/tree/main",
-  "private": true,
   "type": "module",
+  "files": [
+    "svg/",
+    "jsx/",
+    "README.md"
+  ],
   "scripts": {
     "lint": "eslint --cache",
     "format": "prettier --write . --cache --config .prettierrc"
@@ -28,13 +32,11 @@
     "url": "https://github.com/ShawnGeorge03/cloud-icons/issues"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.2.0",
     "@eslint/js": "^9.10.0",
     "eslint": "^9.10.0",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.9.0",
     "prettier": "^3.3.3"
-  },
-  "dependencies": {
-    "@eslint/compat": "^1.2.0"
   }
 }

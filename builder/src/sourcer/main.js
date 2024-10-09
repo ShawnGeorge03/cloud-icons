@@ -19,4 +19,7 @@ await Promise.all(
       )
   )
   .then(() => console.log("Successfully located all links!!\n"))
-  .catch(() => console.log("Unable to located all links!!\n"));
+  .catch((error) => {
+    console.log("Unable to located all links!!\n");
+    console.error(error);
+  });

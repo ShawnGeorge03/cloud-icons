@@ -5,10 +5,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "source": "node src/sourcer/main.js"
+    "source": "node src/sourcer/main.js",
+    "generate": "node src/generator/main.js"
   },
   "dependencies": {
     "jsonschema": "^1.4.1",
-    "selenium-webdriver": "^4.25.0"
+    "selenium-webdriver": "^4.25.0",
+    "svg-to-jsx": "^1.0.4",
+    "svgo": "^3.3.2",
+    "yauzl": "^3.1.3"
   }
 }

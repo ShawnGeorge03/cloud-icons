@@ -6,9 +6,10 @@ This folder contains all the methods to build the icons library
 
 All commands are run from the root of the project, from a terminal:
 
-| Command                        | Action                                                |
-| :----------------------------- | :---------------------------------------------------- |
-| `pnpm --filter builder source` | Sources the Asset Links from the Cloud Provider sites |
+| Command                          | Action                                                |
+| :------------------------------- | :---------------------------------------------------- |
+| `pnpm --filter builder source`   | Sources the Asset Links from the Cloud Provider sites |
+| `pnpm --filter builder generate` | Generates the SVG and JSX components                  |
 
 ## 🔧 Configurations
 
@@ -47,5 +48,20 @@ the following properties:
       "locator": "RFC 2606"
     }
   ]
+}
+```
+
+### sources.json
+
+The `sources.json` will be used by `generator` script and contains links to download
+each of the cloud providers asset packages. The key corresponds to the provider name
+from the `providers.json`, and the value is the asset package download URL.
+
+#### Example
+
+```json
+{
+  "ExampleDomain": "https://example.com/file.zip",
+  "ExampleOrg": "https://example.org/file1.zip"
 }
 ```

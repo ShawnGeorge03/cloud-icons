@@ -1,3 +1,3 @@
 # cloud-icons
 
-A comprehensive collection of high-quality, customizable icons for cloud computing and related technologies.
+Contains over 1500+ icons from AWS, Azure and GCP icon packages.
