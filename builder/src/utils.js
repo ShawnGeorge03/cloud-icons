@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import path from "path";
 
 /**
  * Checks if file/directory path exists.
@@ -16,21 +17,17 @@ export async function doesPathExist(path, mode = fs.constants.F_OK) {
 }
 
 /**
- * Recreates a directory.
+ * Deletes a directory.
  *
  * @param {string} dirPath The path to the directory.
  *
  * @returns {Promise<void>} Returns a Promise that resolves to void.
  */
-export async function recreateDir(dirPath) {
+export async function deleteDir(dirPath) {
   if (await doesPathExist(dirPath))
     await fs
       .rm(dirPath, { recursive: true })
       .then(() => console.log(`Directory deleted: ${dirPath}`));
-
-  await createDir(dirPath).then(() =>
-    console.log(`Successfully recreated ${dirPath}\n`)
-  );
 }
 
 /**
@@ -45,4 +42,22 @@ export async function createDir(dirPath) {
     await fs
       .mkdir(dirPath, { recursive: true })
       .then(() => console.log(`Directory created: ${dirPath}`));
+}
+
+/**
+ * Loads all properties from the `package.json`
+ *
+ * @param {string} dirPath The path of the directory
+ *
+ * @returns {Object} Returns all properties from the `package.json`
+ */
+export async function loadPackageJson(dirPath) {
+  const packagePath = path.join(dirPath, "package.json");
+
+  if (await doesPathExist(packagePath)) {
+    const data = await fs.readFile(packagePath, { encoding: "utf8" });
+    return JSON.parse(data);
+  }
+
+  throw new Error("Unable to access package.json", { cause: packagePath });
 }

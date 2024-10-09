@@ -1,12 +1,13 @@
 {
   "name": "builder",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Builds the Cloud Icons",
   "private": true,
   "type": "module",
   "scripts": {
     "source": "node src/sourcer/main.js",
-    "generate": "node src/generator/main.js"
+    "generate": "node src/generator/main.js",
+    "postpublish": "node src/cleanup.js"
   },
   "dependencies": {
     "jsonschema": "^1.4.1",

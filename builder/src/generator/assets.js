@@ -3,11 +3,9 @@ import fs from "fs";
 import https from "https";
 import path from "path";
 import process from "process";
-import svgToJsx from "svg-to-jsx";
-import { optimize } from "svgo";
 import yauzl from "yauzl";
 
-import { doesPathExist, recreateDir } from "../utils.js";
+import { doesPathExist } from "../utils.js";
 
 export const DOWNLOAD_DIR = path.join(process.cwd(), "downloads");
 export const SVG_DIR = path.join(path.dirname(process.cwd()), "svg");
@@ -90,27 +88,6 @@ export async function download(filename, url) {
         reject(err);
       });
   });
-}
-
-/**
- * Setup the build directory with the required directories
- *
- * @param {Array<string> } sites The provider site names
- *
- * @returns {Promise<void>}
- */
-export async function setupBuild(sites) {
-  await Promise.all(
-    sites.map(async (site) => {
-      await recreateDir(path.join(SVG_DIR, site));
-      await recreateDir(path.join(JSX_DIR, site));
-    })
-  )
-    .then(() => console.log("Successfully setup packages directory!!\n"))
-    .catch((error) => {
-      console.log("Unable to setup packages directory!!\n");
-      console.error(error);
-    });
 }
 
 /**
@@ -228,64 +205,4 @@ export async function extractSVG(filePath) {
       zipfile.readEntry();
     });
   });
-}
-
-/**
- * Optimizes the SVG file
- *
- * @param {Array<string>} filePaths - The paths of all the svg files
- *
- * @returns {Promise<void>}
- */
-export async function optimizeSVG(filePaths) {
-  for (const filePath of filePaths) {
-    if (await doesPathExist(filePath)) {
-      const svgContent = await fs.promises.readFile(filePath, {
-        encoding: "utf8",
-      });
-
-      const optimizedSVG = optimize(svgContent, {
-        plugins: [
-          {
-            name: "preset-default",
-            params: {
-              overrides: {
-                removeViewBox: false,
-              },
-            },
-          },
-          "convertStyleToAttrs",
-          "prefixIds",
-          "removeDimensions",
-        ],
-      });
-
-      await fs.promises.writeFile(filePath, optimizedSVG.data, {
-        encoding: "utf-8",
-      });
-    }
-  }
-}
-
-/**
- * Converts the SVG file to JSX
- *
- * @param {Array<string>} filePaths - The paths of all the svg files
- *
- * @returns {Promise<void>}
- */
-export async function convertSVGtoJSX(filePaths) {
-  for (const filePath of filePaths) {
-    if (await doesPathExist(filePath)) {
-      const svgContent = await fs.promises.readFile(filePath, {
-        encoding: "utf8",
-      });
-
-      const jsxCode = await svgToJsx(svgContent);
-
-      await fs.promises.writeFile(filePath.replaceAll("svg", "jsx"), jsxCode, {
-        encoding: "utf-8",
-      });
-    }
-  }
 }

@@ -1,12 +1,11 @@
 import { createDir } from "../utils.js";
+import { download, DOWNLOAD_DIR, extractSVG } from "./assets.js";
 import {
   convertSVGtoJSX,
-  download,
-  DOWNLOAD_DIR,
-  extractSVG,
+  exportBuildSummary,
   optimizeSVG,
   setupBuild,
-} from "./assets.js";
+} from "./build.js";
 import loadSourcesConfig from "./config.js";
 
 createDir(DOWNLOAD_DIR);
@@ -67,3 +66,6 @@ await Promise.all(
     console.log("Unable to convert all SVG to JSX!!\n");
     console.error(error);
   });
+
+console.log("Exporting Build Summary...");
+await exportBuildSummary(assets);
