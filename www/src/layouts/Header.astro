@@ -1,0 +1,55 @@
+---
+import { Icon } from "astro-icon/components";
+
+const { numItems, sources } = Astro.props;
+
+const links = [
+  {
+    name: "github",
+    label: "GitHub",
+    href: "https://github.com/ShawnGeorge03/cloud-icons/",
+  },
+  {
+    name: "npm",
+    label: "NPM",
+    href: "https://www.npmjs.com/package/cloud-icons",
+  },
+];
+---
+
+<header class="bg-slate-500">
+  <div class="max-w-screen-xl flex flex-col gap-10 mx-auto p-4">
+    <div class="flex justify-between">
+      <a
+        href="/"
+        aria-label="Cloud Icons">
+        <Icon
+          name="logo"
+          class="text-4xl text-white"
+        />
+      </a>
+      <div class="flex justify-evenly space-x-8">
+        {
+          links.map(({ name, label, href }) => (
+            <a
+              aria-label={`Cloud Icons ${label}`}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer">
+              <Icon
+                name={name}
+                class="text-3xl"
+              />
+            </a>
+          ))
+        }
+      </div>
+    </div>
+    <div class="text-center">
+      <h1 class="text-white text-5xl font-bold">Cloud Icons Library</h1>
+      <p class="p-5 text-white">
+        Over {Math.round(numItems / 10) * 10} icons from {sources.join(", ")}
+      </p>
+    </div>
+  </div>
+</header>
