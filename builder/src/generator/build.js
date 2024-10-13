@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import Fuse from "fuse.js";
 import path from "path";
 import process from "process";
 import svgToJsx from "svg-to-jsx";
@@ -6,6 +7,13 @@ import { optimize } from "svgo";
 
 import { createDir, deleteDir, doesPathExist } from "../utils.js";
 import { JSX_DIR, SVG_DIR } from "./assets.js";
+
+export const WWW_DATA_DIR = path.join(
+  path.dirname(process.cwd()),
+  "www",
+  "src",
+  "data"
+);
 
 /**
  * Setup the build directory with the required directories
@@ -15,7 +23,7 @@ import { JSX_DIR, SVG_DIR } from "./assets.js";
  * @returns {Promise<void>}
  */
 export async function setupBuild(sites) {
-  const directories = [];
+  const directories = [WWW_DATA_DIR];
 
   sites.forEach((site) => {
     directories.push(path.join(JSX_DIR, site));
@@ -102,7 +110,7 @@ export async function convertSVGtoJSX(filePaths) {
  */
 
 /**
- * Generates a Build Summary
+ * Exports Search Index and Data
  *
  * @param {Assets} assets All the files by providers used during build
  *
@@ -127,9 +135,28 @@ export async function exportBuildSummary(assets) {
     });
   });
 
+  const index = Fuse.createIndex(["filename", "tags"], config.items);
+
   await fs
     .writeFile(
-      path.join(path.dirname(process.cwd()), "www", "data.json"),
+      path.join(WWW_DATA_DIR, "index.json"),
+      JSON.stringify(index, null, 2),
+      (error) => {
+        if (error) {
+          console.log("An error has occurred ", error);
+          return;
+        }
+      }
+    )
+    .then(() => console.log("Successfully exported search index!!"))
+    .catch((error) => {
+      console.log("Unable to export search index!!");
+      console.error(error);
+    });
+
+  await fs
+    .writeFile(
+      path.join(WWW_DATA_DIR, "icons.json"),
       JSON.stringify(config, null, 2),
       (error) => {
         if (error) {
@@ -138,9 +165,9 @@ export async function exportBuildSummary(assets) {
         }
       }
     )
-    .then(() => console.log("Successfully exported build summary!!\n"))
+    .then(() => console.log("Successfully exported data!!\n"))
     .catch((error) => {
-      console.log("Unable to export build summary!!\n");
+      console.log("Unable to export data!!\n");
       console.error(error);
     });
 }
