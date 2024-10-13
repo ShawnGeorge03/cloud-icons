@@ -4,12 +4,7 @@ import process from "process";
 import svgToJsx from "svg-to-jsx";
 import { optimize } from "svgo";
 
-import {
-  createDir,
-  deleteDir,
-  doesPathExist,
-  loadPackageJson,
-} from "../utils.js";
+import { createDir, deleteDir, doesPathExist } from "../utils.js";
 import { JSX_DIR, SVG_DIR } from "./assets.js";
 
 /**
@@ -115,28 +110,26 @@ export async function convertSVGtoJSX(filePaths) {
  */
 export async function exportBuildSummary(assets) {
   const config = {
-    sources: {},
+    sources: [],
     items: [],
   };
 
-  const { name, version } = await loadPackageJson(path.dirname(process.cwd()));
-
   assets.map(({ site, filePaths }) => {
-    config.sources[site] = site.toLowerCase();
+    config.sources.push(site);
     filePaths.map((filePath) => {
       const filename = path.basename(filePath, ".svg");
       const tags = new Set(filename.split("-").sort());
       config.items.push({
         filename,
-        tags: [config.sources[site], ...tags],
-        links: `${name}@${version}/svg/${site}/${filename}`,
+        tags: [site.toLowerCase(), ...tags],
+        path: `${site}/${filename}`,
       });
     });
   });
 
   await fs
     .writeFile(
-      path.join(path.dirname(process.cwd()), "www", "config.json"),
+      path.join(path.dirname(process.cwd()), "www", "data.json"),
       JSON.stringify(config, null, 2),
       (error) => {
         if (error) {
