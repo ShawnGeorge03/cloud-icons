@@ -116,7 +116,7 @@ export async function convertSVGtoJSX(filePaths) {
  *
  * @returns {Promise<void>}
  */
-export async function exportBuildSummary(assets) {
+export async function exportData(assets) {
   const config = {
     sources: [],
     items: [],

@@ -2,9 +2,9 @@ import { createDir } from "../utils.js";
 import { download, DOWNLOAD_DIR, extractSVG } from "./assets.js";
 import {
   convertSVGtoJSX,
-  exportBuildSummary,
   optimizeSVG,
   setupBuild,
+  exportData,
 } from "./build.js";
 import loadSourcesConfig from "./config.js";
 
@@ -68,4 +68,4 @@ await Promise.all(
   });
 
 console.log("Exporting Build Summary...");
-await exportBuildSummary(assets);
+await exportData(assets);
