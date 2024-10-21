@@ -13,15 +13,30 @@
 
 <p align="center">
     <a href="https://www.npmjs.com/package/cloud-icons?activeTab=versions">
-        <img src="https://img.shields.io/npm/v/cloud-icons" alt="Latest Release">
-    </a>
-    <a href="https://www.jsdelivr.com/package/npm/cloud-icons">
-        <img src="https://data.jsdelivr.com/v1/package/npm/cloud-icons/badge" alt="jsDeliver">
+        <img src="https://img.shields.io/npm/v/cloud-icons/react" alt="Latest Release">
     </a>
 </p>
 
 ## Basic Usage
 
-The quickest way to use these icons is to simply copy the source for the icon
-you need from [cloud-icons.netlify.app](https://cloud-icons.netlify.app/) and
-inline it directly into your HTML:
+First, install `@cloud-icons/react` from npm:
+
+```bash
+pnpm add @cloud-icons/react
+```
+
+Now each icon can be imported individually as a React component:
+
+```js
+import { AmazonApiGateway } from "@cloud-icons/react";
+
+function App() {
+  return (
+    <div>
+      <AmazonApiGateway className="size-6 text-blue-500" />
+
+      <div>...</div>
+    </div>
+  );
+}
+```

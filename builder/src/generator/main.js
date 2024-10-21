@@ -1,6 +1,7 @@
 import { createDir } from "../utils.js";
 import { download, DOWNLOAD_DIR, extractSVG } from "./assets.js";
 import { convertSVGtoJSX, exportBuildSummary, setupBuild } from "./build.js";
+import { convertSVGtoReact } from "./code.js";
 import loadSourcesConfig from "./config.js";
 import optimizeSVG from "./svg.js";
 
@@ -35,7 +36,7 @@ const filePaths = await extractSVG(downloads)
     console.error(error);
   });
 
-console.log("Optimizing SVGs...");
+console.log("Optimizing Asset Packages...");
 await optimizeSVG(filePaths)
   .then(() => console.log("Successfully optimized all assets!!\n"))
   .catch((error) => {
@@ -48,6 +49,14 @@ await convertSVGtoJSX(filePaths)
   .then(() => console.log("Successfully converted all SVG to JSX!!\n"))
   .catch((error) => {
     console.log("Unable to convert all SVG to JSX!!\n");
+    console.error(error);
+  });
+
+console.log("Converting SVG to React...");
+await convertSVGtoReact(filePaths)
+  .then(() => console.log("Successfully converted all SVG to React!!\n"))
+  .catch((error) => {
+    console.log("Unable to convert all SVG to React!!\n");
     console.error(error);
   });
 

@@ -6,6 +6,7 @@ import svgToJsx from "svg-to-jsx";
 
 import { createDir, deleteDir, doesPathExist } from "../utils.js";
 import { JSX_DIR, SVG_DIR } from "./assets.js";
+import { REACT_ICONS_DIR, REACT_INDEX_DTS, REACT_INDEX_JS } from "./code.js";
 
 export const WWW_DATA_DIR = path.join(
   path.dirname(process.cwd()),
@@ -20,7 +21,21 @@ export const WWW_DATA_DIR = path.join(
  * @returns {Promise<void>}
  */
 export async function setupBuild() {
-  const directories = [JSX_DIR, SVG_DIR, WWW_DATA_DIR];
+  const directories = [JSX_DIR, SVG_DIR, WWW_DATA_DIR, REACT_ICONS_DIR];
+
+  fs.writeFile(REACT_INDEX_JS, "")
+    .then(() => console.log("Cleared `index.js` file for React"))
+    .catch((error) => {
+      console.log("Unable to clear `index.js` file for React!!\n");
+      console.error(error);
+    });
+
+  fs.writeFile(REACT_INDEX_DTS, "")
+    .then(() => console.log("Cleared `index.d.ts` file for React"))
+    .catch((error) => {
+      console.log("Unable to clear `index.d.ts` file for React!!\n");
+      console.error(error);
+    });
 
   await Promise.all(
     directories.map(async (directory) => {

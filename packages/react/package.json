@@ -1,0 +1,44 @@
+{
+  "name": "@cloud-icons/react",
+  "version": "0.3.0",
+  "description": "React Cloud Service Providers Icons",
+  "author": "Shawn Santhoshgeorge <32755895+ShawnGeorge03@users.noreply.github.com>",
+  "homepage": "https://github.com/ShawnGeorge03/cloud-icons/tree/main",
+  "type": "module",
+  "keywords": [
+    "cloud",
+    "icons",
+    "svg",
+    "amazon",
+    "aws",
+    "azure",
+    "gcp",
+    "google"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ShawnGeorge03/cloud-icons.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ShawnGeorge03/cloud-icons/issues"
+  },
+  "peerDependencies": {
+    "react": "*"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "require": "./index.js",
+      "import": "./index.js"
+    },
+    "./icons/*": {
+      "require": "./icons/*.jsx",
+      "import": "./icons/*.jsx"
+    }
+  },
+  "files": [
+    "/icons",
+    "index.js",
+    "index.d.ts"
+  ]
+}
