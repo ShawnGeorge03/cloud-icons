@@ -1,31 +1,26 @@
 import fs from "fs/promises";
+import Fuse from "fuse.js";
 import path from "path";
 import process from "process";
 import svgToJsx from "svg-to-jsx";
-import { optimize } from "svgo";
 
-import {
-  createDir,
-  deleteDir,
-  doesPathExist,
-  loadPackageJson,
-} from "../utils.js";
+import { createDir, deleteDir, doesPathExist } from "../utils.js";
 import { JSX_DIR, SVG_DIR } from "./assets.js";
 
+export const WWW_DATA_DIR = path.join(
+  path.dirname(process.cwd()),
+  "www",
+  "src",
+  "data"
+);
+
 /**
- * Setup the build directory with the required directories
- *
- * @param {Array<string> } sites The provider site names
+ * Setup the build with the required directories
  *
  * @returns {Promise<void>}
  */
-export async function setupBuild(sites) {
-  const directories = [];
-
-  sites.forEach((site) => {
-    directories.push(path.join(JSX_DIR, site));
-    directories.push(path.join(SVG_DIR, site));
-  });
+export async function setupBuild() {
+  const directories = [JSX_DIR, SVG_DIR, WWW_DATA_DIR];
 
   await Promise.all(
     directories.map(async (directory) => {
@@ -33,48 +28,11 @@ export async function setupBuild(sites) {
       await createDir(directory);
     })
   )
-    .then(() => console.log("Successfully setup packages directory!!\n"))
+    .then(() => console.log("Successfully setup directories!!\n"))
     .catch((error) => {
-      console.log("Unable to setup packages directory!!\n");
+      console.log("Unable to setup directories!!\n");
       console.error(error);
     });
-}
-
-/**
- * Optimizes the SVG file
- *
- * @param {Array<string>} filePaths - The paths of all the svg files
- *
- * @returns {Promise<void>}
- */
-export async function optimizeSVG(filePaths) {
-  for (const filePath of filePaths) {
-    if (await doesPathExist(filePath)) {
-      const svgContent = await fs.readFile(filePath, {
-        encoding: "utf8",
-      });
-
-      const optimizedSVG = optimize(svgContent, {
-        plugins: [
-          {
-            name: "preset-default",
-            params: {
-              overrides: {
-                removeViewBox: false,
-              },
-            },
-          },
-          "convertStyleToAttrs",
-          "prefixIds",
-          "removeDimensions",
-        ],
-      });
-
-      await fs.writeFile(filePath, optimizedSVG.data, {
-        encoding: "utf-8",
-      });
-    }
-  }
 }
 
 /**
@@ -101,43 +59,43 @@ export async function convertSVGtoJSX(filePaths) {
 }
 
 /**
- * @typedef {Object} Assets
- * @property {string} site - The name of the provider (eg. AWS, Azure, GCP)
- * @property {Array<string>} filePaths - Array of filePaths to `.svg` files
- */
-
-/**
- * Generates a Build Summary
+ * Exports Search Index and Data
  *
- * @param {Assets} assets All the files by providers used during build
+ * @param {Array<string>} sources The names of the providers (eg. AWS, Azure, GCP)
+ * @param {Array<string>} filePaths All the files by providers used during build
  *
  * @returns {Promise<void>}
  */
-export async function exportBuildSummary(assets) {
-  const config = {
-    sources: {},
+export async function exportBuildSummary(sources, filePaths) {
+  const data = {
+    sources,
     items: [],
   };
 
-  const { name, version } = await loadPackageJson(path.dirname(process.cwd()));
+  // Some filenames do not include the common short forms for CSPs
+  // Ex. amazon-simple-storage-service
+  const tagRules = [
+    { source: "amazon", target: "aws" },
+    { source: "microsoft", target: "azure" },
+    { source: "google", target: "gcp" },
+  ];
 
-  assets.map(({ site, filePaths }) => {
-    config.sources[site] = site.toLowerCase();
-    filePaths.map((filePath) => {
-      const filename = path.basename(filePath, ".svg");
-      const tags = new Set(filename.split("-").sort());
-      config.items.push({
-        filename,
-        tags: [config.sources[site], ...tags],
-        links: `${name}@${version}/svg/${site}/${filename}`,
-      });
-    });
-  });
+  for (const filePath of filePaths) {
+    const filename = path.basename(filePath, ".svg");
+    let tags = [...new Set(filename.split("-"))];
+
+    for (const rule of tagRules)
+      if (tags.includes(rule.source)) tags.unshift(rule.target);
+
+    data.items.push({ filename, tags });
+  }
+
+  const index = Fuse.createIndex(["filename", "tags"], data.items);
 
   await fs
     .writeFile(
-      path.join(path.dirname(process.cwd()), "www", "config.json"),
-      JSON.stringify(config, null, 2),
+      path.join(WWW_DATA_DIR, "index.json"),
+      JSON.stringify(index, null, 2),
       (error) => {
         if (error) {
           console.log("An error has occurred ", error);
@@ -145,9 +103,26 @@ export async function exportBuildSummary(assets) {
         }
       }
     )
-    .then(() => console.log("Successfully exported build summary!!\n"))
+    .then(() => console.log("Successfully exported search index!!"))
     .catch((error) => {
-      console.log("Unable to export build summary!!\n");
+      console.log("Unable to export search index!!");
+      console.error(error);
+    });
+
+  await fs
+    .writeFile(
+      path.join(WWW_DATA_DIR, "icons.json"),
+      JSON.stringify(data, null, 2),
+      (error) => {
+        if (error) {
+          console.log("An error has occurred ", error);
+          return;
+        }
+      }
+    )
+    .then(() => console.log("Successfully exported data!!\n"))
+    .catch((error) => {
+      console.log("Unable to export data!!\n");
       console.error(error);
     });
 }

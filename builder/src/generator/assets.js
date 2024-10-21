@@ -1,21 +1,16 @@
 /* eslint-disable no-useless-escape */
+import AdmZip from "adm-zip";
 import fs from "fs";
 import https from "https";
 import path from "path";
 import process from "process";
-import yauzl from "yauzl";
 
 import { doesPathExist } from "../utils.js";
+import generateFilename from "./file.js";
 
 export const DOWNLOAD_DIR = path.join(process.cwd(), "downloads");
 export const SVG_DIR = path.join(path.dirname(process.cwd()), "svg");
 export const JSX_DIR = path.join(path.dirname(process.cwd()), "jsx");
-
-/**
- * @typedef {Object} DownloadResult
- * @property {string} site The providers site name
- * @property {string} filePath Path to the asset package
- */
 
 /**
  * Downloads a zip file from a URL and saves it to /downloads
@@ -23,16 +18,12 @@ export const JSX_DIR = path.join(path.dirname(process.cwd()), "jsx");
  * @param {string} filename - The name to save the zip file as
  * @param {string} url - The URL of the zip file to download
  *
- * @returns {Promise<DownloadResult>} - A promise that resolves to the path of the downloaded file
+ * @returns {Promise<string>} - A promise that resolves to the path of the downloaded file
  */
 export async function download(filename, url) {
   const filePath = path.join(DOWNLOAD_DIR, filename + ".zip");
 
-  if (await doesPathExist(filePath))
-    return {
-      site: filename,
-      filePath,
-    };
+  if (await doesPathExist(filePath)) return filePath;
 
   console.log("Downloading Asset Package from : " + filename);
 
@@ -52,10 +43,7 @@ export async function download(filename, url) {
 
             writeStream.on("finish", () => {
               writeStream.close();
-              resolve({
-                site: filename,
-                filePath,
-              });
+              resolve(filePath);
             });
 
             writeStream.on("error", (err) => {
@@ -93,116 +81,66 @@ export async function download(filename, url) {
 /**
  * Extracts a zip file.
  *
- * @param {string} filePath - The path of the zip file to extract
+ * @param {Array<string>} filePaths - The paths of all the zip files to extract
  *
  * @returns {Promise<Array<string>} - A promise that resolves to the path of the extracted files
  */
-export async function extractSVG(filePath) {
-  if (!filePath.endsWith(".zip"))
-    throw new Error("File must end with .zip", { cause: filePath });
-
-  if (!(await doesPathExist(filePath)))
-    throw new Error("File does not exist", { cause: filePath });
-
-  const site = path.basename(filePath, ".zip");
-  const outputDir = path.join(SVG_DIR, site);
+export async function extractSVG(filePaths) {
   const outputPaths = new Set();
 
-  const generateFilename = (site, filename) => {
-    let uniqueFilename = path.basename(filename, ".svg");
+  for (const filePath of filePaths) {
+    if (!filePath.endsWith(".zip"))
+      throw new Error("File must end with .zip", { cause: filePath });
 
-    switch (site) {
-      case "AWS":
-        uniqueFilename = uniqueFilename.replace(
-          /^Arch_|_48|32|Arch-Category_|Res_|-|_|&| /g,
-          " "
-        );
-        break;
-      case "Azure":
-        uniqueFilename = uniqueFilename
-          .replace(/\d+-icon-service|_|-|\(|\)/g, " ")
-          .replace(/\+/g, "plus");
-        break;
-      case "GCP":
-        uniqueFilename = uniqueFilename.split(/_|-/g).join(" ");
-        break;
-      default:
-        throw new Error("Invalid Site", { cause: site });
-    }
+    if (!(await doesPathExist(filePath)))
+      throw new Error("File does not exist", { cause: filePath });
 
-    return uniqueFilename.trim().split(/\s+/).join("-").toLowerCase() + ".svg";
-  };
+    try {
+      const site = path.basename(filePath, ".zip");
+      const zip = new AdmZip(filePath);
+      const zipEntries = zip.getEntries();
 
-  return new Promise((resolve, reject) => {
-    yauzl.open(filePath, { lazyEntries: true }, (err, zipfile) => {
-      if (err) return reject(err);
-
-      zipfile.on("entry", (entry) => {
+      for (const entry of zipEntries) {
         const fileFilterRule =
           site === "AWS"
-            ? !entry.fileName.includes("__MACOSX") &&
-              (entry.fileName.match(
+            ? entry.entryName.match(
                 /Architecture-Group-Icons_[\d]+[\\\/][\w-]+.svg/
               ) ||
-                entry.fileName.match(
-                  /Architecture-Service-Icons_[\d]+[\\\/][\w-]+[\\\/]32[\\\/][\w-]+.svg/
-                ) ||
-                entry.fileName.match(
-                  /Category-Icons_[\d]+[\\\/]Arch-Category_32[\\\/][\w-]+.svg/
-                ) ||
-                entry.fileName.match(
-                  /Resource-Icons_[\d]+[\\\/][\w-]+[\\\/][\w-]+.svg/
-                ))
-            : entry.fileName.endsWith(".svg");
+              entry.entryName.match(
+                /Architecture-Service-Icons_[\d]+[\\\/][\w-]+[\\\/]32[\\\/][\w-]+.svg/
+              ) ||
+              entry.entryName.match(
+                /Category-Icons_[\d]+[\\\/]Arch-Category_32[\\\/][\w-]+.svg/
+              ) ||
+              entry.entryName.match(
+                /Resource-Icons_[\d]+[\\\/][\w-]+[\\\/][\w-]+.svg/
+              )
+            : entry.entryName.endsWith(".svg");
 
         if (fileFilterRule) {
-          // SVG file entry (regardless of directory)
-          zipfile.openReadStream(entry, (err, readStream) => {
-            if (err) return reject(err);
+          const filename = generateFilename(site, entry.entryName);
 
-            fs.mkdir(outputDir, { recursive: true }, (err) => {
-              if (err) return reject(err);
+          // Ensures the filename is unique among all filenames
+          let outputPath = path.join(SVG_DIR, filename);
+          let count = 0;
+          while (outputPaths.has(outputPath)) {
+            count += 1;
+            outputPath = path.join(
+              SVG_DIR,
+              `${path.parse(filename).name}-alternate-${count}.svg`
+            );
+          }
 
-              const outputPath = path.join(
-                outputDir,
-                generateFilename(site, entry.fileName)
-              );
-
-              let count = 0;
-              let uniquePath = outputPath;
-              while (
-                outputPaths.has(uniquePath.replace(".svg", `-alt${count}.svg`))
-              )
-                count += 1;
-
-              if (count !== 0)
-                uniquePath = uniquePath.replace(".svg", `-alt${count}.svg`);
-
-              const writeStream = fs.createWriteStream(uniquePath);
-
-              readStream.on("error", reject);
-              writeStream.on("error", reject);
-
-              readStream.pipe(writeStream);
-
-              writeStream.on("finish", () => {
-                outputPaths.add(uniquePath);
-                zipfile.readEntry();
-              });
-            });
-          });
-        } else {
-          // Not an SVG file or a directory, skip it
-          zipfile.readEntry();
+          const fileContent = zip.readAsText(entry.entryName);
+          await fs.promises.writeFile(outputPath, fileContent);
+          outputPaths.add(outputPath);
         }
-      });
+      }
+      console.log(`Successfully processed ${filePath}`);
+    } catch (error) {
+      console.error(`Failed to process ${filePath}:`, error);
+    }
+  }
 
-      zipfile.on("close", () =>
-        resolve(Array.from(outputPaths).sort((a, b) => (a > b ? 1 : -1)))
-      );
-      zipfile.on("error", reject);
-
-      zipfile.readEntry();
-    });
-  });
+  return Array.from(outputPaths).sort((a, b) => a.localeCompare(b));
 }

@@ -1,12 +1,8 @@
 import { createDir } from "../utils.js";
 import { download, DOWNLOAD_DIR, extractSVG } from "./assets.js";
-import {
-  convertSVGtoJSX,
-  exportBuildSummary,
-  optimizeSVG,
-  setupBuild,
-} from "./build.js";
+import { convertSVGtoJSX, exportBuildSummary, setupBuild } from "./build.js";
 import loadSourcesConfig from "./config.js";
+import optimizeSVG from "./svg.js";
 
 createDir(DOWNLOAD_DIR);
 
@@ -26,14 +22,10 @@ const downloads = await Promise.all(
   });
 
 console.log("Setup Packages Directory...");
-await setupBuild(Object.keys(sources));
+await setupBuild();
 
 console.log("Extracting Asset Packages...");
-const assets = await Promise.all(
-  downloads.map(async ({ site, filePath }) => {
-    return { site, filePaths: await extractSVG(filePath) };
-  })
-)
+const filePaths = await extractSVG(downloads)
   .then((results) => {
     console.log("Successfully extracted all asset packages!!\n");
     return results;
@@ -43,24 +35,16 @@ const assets = await Promise.all(
     console.error(error);
   });
 
-console.log("Optimizing Asset Packages...");
-await Promise.all(
-  assets.map(async ({ filePaths }) => {
-    await optimizeSVG(filePaths);
-  })
-)
+console.log("Optimizing SVGs...");
+await optimizeSVG(filePaths)
   .then(() => console.log("Successfully optimized all assets!!\n"))
   .catch((error) => {
     console.log("Unable to optimize assets!!\n");
     console.error(error);
   });
 
-console.log("Converting SVGs to JSX...");
-await Promise.all(
-  assets.map(async ({ filePaths }) => {
-    await convertSVGtoJSX(filePaths);
-  })
-)
+console.log("Converting SVG to JSX...");
+await convertSVGtoJSX(filePaths)
   .then(() => console.log("Successfully converted all SVG to JSX!!\n"))
   .catch((error) => {
     console.log("Unable to convert all SVG to JSX!!\n");
@@ -68,4 +52,4 @@ await Promise.all(
   });
 
 console.log("Exporting Build Summary...");
-await exportBuildSummary(assets);
+await exportBuildSummary(Object.keys(sources), filePaths);
