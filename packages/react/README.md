@@ -9,8 +9,6 @@
     </a>
 </h1>
 
-<p align="center">Over 1590 icons from AWS, Azure, GCP.<p>
-
 <p align="center">
     <a href="https://www.npmjs.com/package/cloud-icons?activeTab=versions">
         <img src="https://img.shields.io/npm/v/cloud-icons/react" alt="Latest Release">
