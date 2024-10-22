@@ -1,18 +1,14 @@
 {
   "keys": [
     {
-      "path": [
-        "filename"
-      ],
+      "path": ["filename"],
       "id": "filename",
       "weight": 1,
       "src": "filename",
       "getFn": null
     },
     {
-      "path": [
-        "tags"
-      ],
+      "path": ["tags"],
       "id": "tags",
       "weight": 1,
       "src": "tags",

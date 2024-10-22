@@ -1,5 +1,12 @@
 ---
 import "@fontsource-variable/inter";
+
+import Footer from "@/layouts/Footer.astro";
+import Header from "@/layouts/Header.astro";
+
+import Search from "@/components/Search";
+
+import { items, sources } from "@/data/icons.json";
 ---
 
 <html lang="en">
@@ -18,9 +25,94 @@ import "@fontsource-variable/inter";
       name="generator"
       content={Astro.generator}
     />
-    <title>Astro</title>
+    <title>cloud-icons</title>
   </head>
-  <body>
-    <h1>Astro</h1>
+  <body class="min-h-screen flex flex-col bg-white dark:bg-zinc-900">
+    <Header
+      numItems={items.length}
+      sources={sources}
+    />
+    <main>
+      <Search client:only="react">
+        <div
+          slot="fallback"
+          class="m-auto w-1/6">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 200 200">
+            <radialGradient
+              id="a"
+              cx=".66"
+              cy=".3125"
+              fx=".66"
+              fy=".3125"
+              gradientTransform="scale(1.5)">
+              <stop offset="0"></stop>
+              <stop
+                offset=".3"
+                stop-opacity=".9"
+              ></stop>
+              <stop
+                offset=".6"
+                stop-opacity=".6"
+              ></stop>
+              <stop
+                offset=".8"
+                stop-opacity=".3"
+              ></stop>
+              <stop
+                offset="1"
+                stop-opacity="0"
+              ></stop>
+            </radialGradient>
+            <circle
+              cx="100"
+              cy="100"
+              r="70"
+              fill="none"
+              stroke="url(#a)"
+              stroke-dasharray="200 1000"
+              stroke-linecap="round"
+              stroke-width="15"
+              transform-origin="center">
+              <animateTransform
+                attributeName="transform"
+                calcMode="spline"
+                dur="2"
+                keySplines="0 0 1 1"
+                keyTimes="0;1"
+                repeatCount="indefinite"
+                type="rotate"
+                values="360;0"
+              ></animateTransform>
+            </circle>
+            <circle
+              cx="100"
+              cy="100"
+              r="70"
+              fill="none"
+              stroke="#000"
+              stroke-linecap="round"
+              stroke-width="15"
+              opacity=".2"
+              transform-origin="center"
+            ></circle>
+
+            <style>
+              circle {
+                stroke: #000;
+              }
+
+              @media (prefers-color-scheme: dark) {
+                circle {
+                  stroke: #fff;
+                }
+              }
+            </style>
+          </svg>
+        </div>
+      </Search>
+    </main>
+    <Footer />
   </body>
 </html>

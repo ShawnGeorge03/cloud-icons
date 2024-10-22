@@ -1,0 +1,37 @@
+---
+const GITHUB_REPOS_API =
+  "https://api.github.com/repos/ShawnGeorge03/cloud-icons/branches/main";
+
+const lastUpdatedDate = await fetch(GITHUB_REPOS_API)
+  .then((res) => {
+    if (res.ok) return res.json();
+    throw new Error(res.status.toString(), { cause: res.statusText });
+  })
+  .then((res) => {
+    let githubDate = new Date(res.commit.commit.author.date);
+
+    githubDate = new Date(
+      githubDate.getTime() + githubDate.getTimezoneOffset() * 60000
+    );
+
+    return githubDate.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    });
+  })
+  .catch((error) => {
+    console.error(error);
+    return undefined;
+  });
+---
+
+<footer
+  class="mt-auto flex flex-col text-center gap-4 text-black dark:text-white">
+  <p>made with ❤️ by Shawn SG</p>
+  {lastUpdatedDate && <p>{lastUpdatedDate}</p>}
+</footer>
